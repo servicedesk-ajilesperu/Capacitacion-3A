@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plataforma de Capacitación</title>
+    <!-- Incluye el script de Tailwind para un mejor manejo de estilos si fuera necesario, aunque se usa CSS Custom. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root{
+            --primary:#FF4500; /* Color naranja rojizo (OrangeRed) */
+            --accent:#0f62fe; /* Azul para el 'thumb' */
+            --muted:#6b7280;
+            --bg:#f8fafc;
+            --card:#ffffff;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        *{box-sizing:border-box}
+        body{margin:0;background:var(--bg);color:#0b1220;line-height:1.4}
+
+        /* Layout */
+        .container{max-width:1100px;margin:22px auto;padding:0 18px}
+        .hero-card{
+            background:var(--primary);
+            color: white;
+            padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(12,20,33,0.06)
+        }
+        .hero h1{margin:0;font-size:26px}
+        .hero p{color:rgba(255,255,255,0.85); margin-top:8px}
+
+        /* Sección del catálogo de cursos con fondo blanco */
+        .courses-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 22px;
+            box-shadow:0 6px 18px rgba(12,20,33,0.06);
+        }
+        .courses-section h2 {
+            margin-top: 0;
+            color: #0b1220;
+            font-size: 26px;
+        }
+
+        /* Cards grid */
+        .grid{display:grid;grid-template-columns:repeat(1,1fr);gap:16px;margin-top:18px}
+        .course{
+            /* Fondo semi-transparente para que el efecto de desenfoque sea visible (Glassmorphism) */
+            background:rgba(255, 69, 0, 0.8);
+            /* Difuminado */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Para compatibilidad con Safari */
+            color: white;
+            padding:14px;border-radius:12px;display:flex;align-items:flex-start;flex-direction:column;box-shadow:0 4px 12px rgba(11,18,32,0.04)
+        }
+        .thumb{
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background:linear-gradient(135deg,var(--accent),#99bbff);
+            display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:24px;
+            margin-bottom: 10px;
+        }
+        .course-info{flex:1; width: 100%;} /* Asegura que el info tome todo el ancho en mobile */
+        .course-info h3{margin:0;font-size:16px}
+        .course-info .meta{color:rgba(255,255,255,0.7); font-size:13px;margin-top:4px}
+        .course-info p{color:rgba(255,255,255,0.9); font-size:14px;margin-top:8px;margin-bottom:12px}
+        .actions{margin-top:auto;display:flex;gap:8px; justify-content: flex-end; width: 100%;}
+        .btn-course{
+            padding:8px 12px;
+            border-radius:8px;
+            border:1px solid rgba(255,255,255,0.5);
+            background: transparent;
+            cursor:pointer;
+            flex:1;
+            color:white;
+            transition: background 0.2s;
+        }
+        .btn-course:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .btn-primary{
+            background: transparent;
+            color:white;
+            border:1px solid rgba(255,255,255,0.5);
+            flex: none;
+        }
+
+        /* Video modal */
+        /* Usamos 'opacity' y 'visibility' para una transición suave, en lugar de 'display:none' */
+        .modal{
+            visibility: hidden;
+            opacity: 0;
+            position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);
+            display:flex;align-items:center;justify-content:center;z-index:1000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.show{
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content{position:relative;width:90%;max-width:900px}
+        .modal iframe{width:100%;height:450px;border:none;border-radius:8px}
+        .close{
+            position:absolute;
+            top:-30px;
+            right:0;
+            background:#fff;
+            color: var(--primary);
+            border:none;
+            font-size:24px;
+            cursor:pointer;
+            padding:0 12px;
+            line-height: 1;
+            border-radius:6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .close:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Responsive */
+        @media(min-width:700px){
+            .grid{grid-template-columns:repeat(2,1fr)}
+            .course{
+                flex-direction:row;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            .thumb{
+                width: 60px;
+                height: 60px;
+                margin-bottom: 0;
+            }
+            .course-info{flex:1}
+            .actions{flex-direction:row;gap:8px;margin-top:0; justify-content: flex-end; width: auto;}
+            .btn-course{flex:none}
+            .btn-primary{flex:none;}
+        }
+        @media(min-width:1000px){
+            .grid{grid-template-columns:repeat(3,1fr)}
+            .hero h1{font-size:32px}
+        }
+        @media(max-width: 699px) {
+            .modal iframe{
+                height: 250px; /* Altura más pequeña en mobile */
+            }
+            .close{
+                top: -35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <section class="hero">
+            <div class="hero-card">
+                <h1>Bienvenido a la Plataforma de Capacitación</h1>
+                <p>Explora nuestros cursos y aprende a tu ritmo.</p>
+            </div>
+        </section>
+
+        <section class="courses-section">
+            <h2>Catálogo de cursos</h2>
+            <div class="grid">
+                
+                <article class="course">
+                    <div class="thumb">KP</div>
+                    <div class="course-info">
+                        <h3>Kallpa</h3>
+                        <p>Aprende a usar funciones principales y fundamentales con kallpa.</p>
+                        <div class="actions">
+                            <button class="btn-course btn-primary" onclick="openVideo('https://www.youtube.com/embed/R_da5drE2jM')">Ver</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="course">
+                    <div class="thumb">EC</div>
+                    <div class="course-info">
+                        <h3>Equipos de Comunicación</h3>
+                        <p>Descubre y reconoce lo equipos de comunicacón en tienda.</p>
+                        <div class="actions">
+                            <button class="btn-course btn-primary" onclick="openVideo('https://www.youtube.com/embed/9AgqCf7kaVk')">Ver</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="course">
+                    <div class="thumb">OT</div>
+                    <div class="course-info">
+                        <!-- Se cambia el thumb a OT (Operaciones Tienda) para mejor identificación -->
+                        <h3>Capacitación Operaciones en Tienda</h3>
+                        <p>Curso fundamental para entender y conocer los diversos equipos de tienda, y saber como reportar una incidencia y/o requerimiento.</p>
+                        <div class="actions">
+                            <!-- VIDEO ACTUALIZADO: n_uhvAOzPUI -->
+                            <button class="btn-course btn-primary" onclick="openVideo('https://www.youtube.com/embed/n_uhvAOzPUI')">Ver</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="course">
+                    <div class="thumb">KW</div>
+                    <div class="course-info">
+                        <!-- Se cambia el thumb a KW (Kallpa Web) para mejor identificación -->
+                        <h3>Kallpa Web Tiendas</h3>
+                        <p>Cuerso para conocer el funcionamiento de la nueva web para stock y realizar tranferencias correctas.</p>
+                        <div class="actions">
+                            <button class="btn-course btn-primary" onclick="openVideo('https://www.youtube.com/embed/ysz5S6PUM-U')">Ver</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Puedes agregar más cursos aquí -->
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Video Modal Structure (Implementación del popup para videos) -->
+    <div id="videoModal" class="modal" onclick="closeVideo(event)">
+        <div class="modal-content">
+            <!-- Botón de cierre -->
+            <button class="close" onclick="closeVideo(event)">&times;</button>
+            <!-- El iframe cargará el video de YouTube -->
+            <iframe id="videoFrame" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+        </div>
+    </div>
+    <!-- Fin del Video Modal Structure -->
+
+    <footer>
+        <p>&copy; 2025, Ajiles Perú SAC. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        const modal = document.getElementById('videoModal');
+        const iframe = document.getElementById('videoFrame');
+
+        /**
+         * Detiene la reproducción del video al limpiar el atributo src del iframe.
+         */
+        function stopVideo() {
+            // Reemplaza el src con una cadena vacía para forzar la detención de la reproducción
+            iframe.src = '';
+        }
+
+        /**
+         * Abre el modal y establece la URL del video.
+         * @param {string} url - La URL de inserción (embed) del video de YouTube.
+         */
+        function openVideo(url) {
+            if (!url) {
+                console.error('Error: URL del video no proporcionada.');
+                return;
+            }
+
+            // Establece la fuente del video y añade el parámetro '?autoplay=1' para inicio automático
+            iframe.src = url + '?autoplay=1'; 
+            modal.classList.add('show');
+        }
+
+        /**
+         * Cierra el modal y detiene el video si el clic fue en el fondo o en el botón de cerrar.
+         * @param {Event} event - El evento de clic.
+         */
+        function closeVideo(event) {
+            // Comprueba si el clic ocurrió en el fondo del modal o en el botón de cierre
+            if (event.target === modal || event.target.classList.contains('close')) {
+                event.stopPropagation();
+                
+                modal.classList.remove('show');
+                stopVideo(); // Detiene el video al cerrar el modal
+            }
+        }
+        
+        // Listener para cerrar el modal con la tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.classList.contains('show')) {
+                modal.classList.remove('show');
+                stopVideo();
+            }
+        });
+
+    </script>
+</body>
+</html>
